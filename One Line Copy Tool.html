@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>1行まるまるコピーツール</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+    }
+    .line-container {
+      margin-top: 20px;
+    }
+    .line {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .line-number {
+      width: 30px;
+      text-align: right;
+      margin-right: 10px;
+      color: #888;
+    }
+    .text {
+      flex: 1;
+      padding: 5px 10px;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      word-break: break-word;
+    }
+    button {
+      margin-left: 10px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>1行まるまるコピーツール</h2>
+<p>function等改行で区切られた文章を入力し、「行を生成」ボタンを押すと分割されコピーできる状態で表示されます。</p>
+<p>コメントアウト的な使い方を想定して、#で始まるを除外します。</p>
+
+<textarea id="inputText" placeholder="ここに文章を入力..."></textarea>
+<br>
+<button onclick="generateLines()">行を生成</button>
+
+<div class="line-container" id="outputContainer"></div>
+
+<script>
+  function generateLines() {
+    const container = document.getElementById('outputContainer');
+    container.innerHTML = ''; // 初期化
+
+    const lines = document.getElementById('inputText').value.split('\n');
+    let visibleLineCount = 0; // 表示された行数をカウント
+
+    lines.forEach((line) => {
+      const trimmed = line.trim();
+      if (trimmed !== '' && !trimmed.startsWith('#')) {
+        visibleLineCount++; // 有効な行ごとにカウント
+
+        const div = document.createElement('div');
+        div.className = 'line';
+
+        // ★ 行番号を表示する span 要素を追加
+        const numberSpan = document.createElement('span');
+        numberSpan.className = 'line-number';
+        numberSpan.textContent = visibleLineCount;
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'text';
+        textSpan.textContent = trimmed;
+
+        const button = document.createElement('button');
+        button.textContent = 'copy';
+        button.onclick = () => {
+          navigator.clipboard.writeText(trimmed).then(() => {
+            button.textContent = 'success!';
+            setTimeout(() => button.textContent = 'copy', 1000);
+          });
+        };
+
+        // 行番号 → テキスト → ボタンの順で追加
+        div.appendChild(numberSpan);
+        div.appendChild(textSpan);
+        div.appendChild(button);
+        container.appendChild(div);
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
